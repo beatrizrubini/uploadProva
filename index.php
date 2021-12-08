@@ -1,7 +1,27 @@
 <?php
 
 function valido(){
-    if($_POST['username'] == 'orlando' and $_POST['password'] == '123mudar'){
+  
+    // Define o nome do arquivo que deve ser lido na forma de uma constante
+    define('NOME_ARQUIVO_LOGIN', 'senhas.txt'); 
+    
+    $loginData = []; // É nessa variável que vão estar os valores lidos no arquivo TXT
+    try {
+        $fpointer = @fopen(NOME_ARQUIVO_LOGIN, 'r') or die('Não foi possível abrir o arquivo.'); // Abre o arquivo em modo leitura (reading) - 'r'
+        $line = trim(fgets($fpointer)); // Lê uma linha do arquivo: USER=orlando|PASS=123mudar
+        $values = explode('|', $line); // Separa os valores em um array: [0 => 'USER=orlando', 1 => 'PASS=123mudar']
+        
+        // Cria um array com as informações lidas do arquivo TXT. ['USER' => 'orlando', 'PASS' => '123mudar']
+        foreach($values as $value) {
+            $data = explode('=', $value);
+            $loginData[$data[0]] = $data[1];
+        }
+    } finally {
+        fclose($fpointer); // Libera o arquivo, indicando que operação de leitura terminou.
+    }
+    $user = $loginData['USER'];
+    $pass = $loginData['PASS'];
+    if($_POST['username'] == $user and $_POST['password'] == $pass){
         return TRUE;
     }
     return FALSE;
@@ -17,6 +37,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $_SESSION['loggedin'] = FALSE;
     }
 }
+
 ?>
  
 <!DOCTYPE html>
